@@ -1,0 +1,12 @@
+CREATE SEQUENCE link_seq START 1 INCREMENT 50;
+
+CREATE TABLE links (
+    id BIGINT PRIMARY KEY DEFAULT nextval('link_seq'),
+    short_code VARCHAR(8) NOT NULL UNIQUE,
+    original_url VARCHAR NOT NULL,
+    clicks BIGINT DEFAULT 0 NOT NULL ,
+    expires_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL
+
+);
+
