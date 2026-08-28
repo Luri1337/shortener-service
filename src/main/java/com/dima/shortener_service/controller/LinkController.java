@@ -3,7 +3,6 @@ package com.dima.shortener_service.controller;
 import com.dima.shortener_service.dto.CreateLinkRequest;
 import com.dima.shortener_service.dto.LinkInfoResponse;
 import com.dima.shortener_service.dto.LinkResponse;
-import com.dima.shortener_service.exception.LinkExpiredException;
 import com.dima.shortener_service.service.LinkService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -32,14 +31,11 @@ public class LinkController {
     @GetMapping("/{shortCode}")
     public ResponseEntity<Void> redirectToOriginalUrl(@PathVariable String shortCode) {
         String originalUrl = linkService.getOriginalUrl(shortCode);
-        if (linkService.isExpired(shortCode)) {
-           throw new LinkExpiredException("Link has expired");
-        }
+
         return ResponseEntity
                 .status(HttpStatus.FOUND)
                 .location(URI.create(originalUrl))
                 .build();
-
     }
 
     @GetMapping("/api/links/{shortCode}")

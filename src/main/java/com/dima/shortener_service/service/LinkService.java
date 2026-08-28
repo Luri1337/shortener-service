@@ -5,6 +5,7 @@ import com.dima.shortener_service.dto.CreateLinkRequest;
 import com.dima.shortener_service.dto.LinkInfoResponse;
 import com.dima.shortener_service.dto.LinkResponse;
 import com.dima.shortener_service.entity.Link;
+import com.dima.shortener_service.exception.LinkExpiredException;
 import com.dima.shortener_service.exception.LinkNotFoundException;
 import com.dima.shortener_service.repository.LinkRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,9 +44,14 @@ public class LinkService {
     public String getOriginalUrl(String shortCode) {
         Link link = linkRepository
                 .findByShortCode(shortCode)
-                .orElseThrow(
-                        () -> new LinkNotFoundException("Link not found")
-                );
+                .orElseThrow(() -> new LinkNotFoundException("Link not found"));
+
+        if (link.isExpired()) {
+            throw new LinkExpiredException("Link has expired");
+        }
+
+        link.setClicks(link.getClicks() + 1);
+        linkRepository.save(link);
 
         return link.getOriginalUrl();
     }
@@ -63,26 +69,21 @@ public class LinkService {
         response.setClickCount(link.getClicks());
         response.setCreatedAt(link.getCreatedAt());
         response.setExpiresAt(link.getExpiresAt());
+        response.setShortUrl(baseUrl + "/" + link.getShortCode());
 
         return response;
     }
 
     public long getClickCount(String shortCode) {
-        return linkRepository.getClicksByShortCode(shortCode);
+        Link link = linkRepository.findByShortCode(shortCode)
+                .orElseThrow(
+                        () -> new LinkNotFoundException("Link not found")
+                );
+        return link.getClicks();
     }
 
     public void deleteLink(String shortCode) {
         linkRepository.deleteByShortCode(shortCode);
-    }
-
-    public boolean isExpired(String shortCode) {
-        Link link = linkRepository
-                .findByShortCode(shortCode)
-                .orElseThrow(
-                        () -> new LinkNotFoundException("Link not found")
-                );
-
-        return link.isExpired();
     }
 
     private String generateShortCode() {
