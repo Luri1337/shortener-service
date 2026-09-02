@@ -36,7 +36,7 @@ public class LinkService {
         linkRepository.save(link);
 
         LinkResponse response = new LinkResponse();
-        response.setShortUrl(baseUrl + "/" + link.getShortCode());
+        response.setShortUrl(baseUrl + "/r/" + link.getShortCode());
         response.setShortCode(link.getShortCode());
         response.setExpiresAt(link.getExpiresAt());
         return response;

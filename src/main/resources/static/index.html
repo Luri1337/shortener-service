@@ -561,7 +561,7 @@
 
       // Показываем результат
       const linkEl = document.getElementById('result-short-url');
-      const shortUrl = `${BASE}/${data.shortCode}`;
+      const shortUrl = `${BASE}/r/${data.shortCode}`;
       linkEl.href = shortUrl;
       linkEl.textContent = shortUrl;
 
@@ -630,7 +630,7 @@
       const d = await resInfo.json();
 
       document.getElementById('info-code').textContent     = d.shortCode;
-      document.getElementById('info-short').textContent    = `${BASE}/${d.shortCode}`;
+      document.getElementById('info-short').textContent    = `${BASE}/r/${d.shortCode}`;
       document.getElementById('info-original').textContent = d.originalUrl;
       document.getElementById('info-created').textContent  = d.createdAt
         ? new Date(d.createdAt).toLocaleString('ru-RU') : '—';

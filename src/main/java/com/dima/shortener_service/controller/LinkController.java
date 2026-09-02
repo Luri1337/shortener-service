@@ -28,7 +28,7 @@ public class LinkController {
                 .body(linkService.createLink(request));
     }
 
-    @GetMapping("/{shortCode}")
+    @GetMapping("/r/{shortCode}")
     public ResponseEntity<Void> redirectToOriginalUrl(@PathVariable String shortCode) {
         String originalUrl = linkService.getOriginalUrl(shortCode);
 
