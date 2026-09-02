@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shortener</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:         #0F1117;
+      --panel:      #1A1D27;
+      --panel2:     #141720;
+      --border:     #2D3145;
+      --accent:     #00D4FF;
+      --accent-dim: rgba(0, 212, 255, 0.10);
+      --accent-dim2:rgba(0, 212, 255, 0.06);
+      --text:       #F0F4FF;
+      --muted:      #8892B0;
+      --error:      #FF5370;
+      --error-dim:  rgba(255, 83, 112, 0.10);
+      --success:    #3DDC84;
+      --success-dim:rgba(61, 220, 132, 0.10);
+      --warn:       #FFD166;
+      --r:          10px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      padding: 32px 16px 64px;
+    }
+
+    /* ── Layout ── */
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* ── Header ── */
+    header { text-align: center; padding: 12px 0 8px; }
+
+    .logo {
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-size: clamp(24px, 5vw, 38px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+    }
+
+    h1 span { color: var(--accent); }
+
+    .subtitle { margin-top: 8px; color: var(--muted); font-size: 14px; }
+
+    /* ── Tabs ── */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 5px;
+    }
+
+    .tab {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 9px 12px;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all 0.15s;
+      letter-spacing: 0.02em;
+      width: auto;
+      margin: 0;
+    }
+
+    .tab:hover { color: var(--text); background: var(--accent-dim2); }
+
+    .tab.active {
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid rgba(0,212,255,0.25);
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 28px;
+      display: none;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .card.active { display: flex; }
+
+    /* ── Section title ── */
+    .section-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding-bottom: 2px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ── Form elements ── */
+    .field { display: flex; flex-direction: column; gap: 7px; }
+
+    label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    input[type="url"],
+    input[type="number"],
+    input[type="text"] {
+      width: 100%;
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 14px;
+      padding: 11px 14px;
+      outline: none;
+      transition: border-color 0.18s;
+      font-family: 'Courier New', monospace;
+    }
+
+    input:focus { border-color: var(--accent); }
+    input::placeholder { color: var(--muted); }
+
+    .row { display: flex; gap: 12px; }
+    .row .field { flex: 1; }
+
+    /* ── Buttons ── */
+    .btn {
+      background: var(--accent);
+      color: #0F1117;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      padding: 11px 20px;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+      width: 100%;
+      margin: 0;
+    }
+
+    .btn:hover { opacity: 0.88; }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); opacity: 1; }
+
+    .btn-danger {
+      background: transparent;
+      border: 1px solid rgba(255,83,112,0.4);
+      color: var(--error);
+    }
+
+    .btn-danger:hover { background: var(--error-dim); opacity: 1; }
+
+    .btn-sm {
+      padding: 7px 14px;
+      font-size: 11px;
+      width: auto;
+      border-radius: 6px;
+    }
+
+    /* ── Messages ── */
+    .msg {
+      font-size: 13px;
+      padding: 10px 14px;
+      border-radius: 7px;
+      display: none;
+    }
+
+    .msg.error   { display: block; color: var(--error);   background: var(--error-dim);   border: 1px solid rgba(255,83,112,0.25); }
+    .msg.success { display: block; color: var(--success); background: var(--success-dim); border: 1px solid rgba(61,220,132,0.25); }
+
+    /* ── Result box ── */
+    .result-box {
+      background: var(--accent-dim);
+      border: 1px solid rgba(0,212,255,0.3);
+      border-radius: var(--r);
+      padding: 16px;
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .result-box.visible { display: flex; }
+
+    .result-url-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .result-url-row a {
+      font-family: 'Courier New', monospace;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--accent);
+      text-decoration: none;
+      flex: 1;
+      word-break: break-all;
+    }
+
+    .result-url-row a:hover { text-decoration: underline; }
+
+    /* ── Stats grid ── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .stat-cell {
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+    }
+
+    .stat-val {
+      font-family: 'Courier New', monospace;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .stat-key {
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-top: 3px;
+    }
+
+    /* ── Info table ── */
+    .info-table { display: flex; flex-direction: column; gap: 8px; }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      gap: 12px;
+    }
+
+    .info-key {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      white-space: nowrap;
+    }
+
+    .info-val {
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      color: var(--text);
+      text-align: right;
+      word-break: break-all;
+    }
+
+    .info-val.accent { color: var(--accent); }
+
+    /* ── Badge ── */
+    .badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 20px;
+      letter-spacing: 0.06em;
+    }
+
+    .badge-ok      { background: var(--success-dim); color: var(--success); border: 1px solid rgba(61,220,132,0.3); }
+    .badge-expired { background: var(--error-dim);   color: var(--error);   border: 1px solid rgba(255,83,112,0.3); }
+
+    /* ── Divider ── */
+    hr { border: none; border-top: 1px solid var(--border); }
+
+    /* ── Links history ── */
+    .history-empty {
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      padding: 24px 0;
+    }
+
+    .history-item {
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+
+    .history-item:hover { border-color: var(--accent); }
+
+    .history-code {
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      white-space: nowrap;
+    }
+
+    .history-url {
+      font-size: 12px;
+      color: var(--muted);
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .history-list { display: flex; flex-direction: column; gap: 8px; }
+
+    @media (max-width: 480px) {
+      .row { flex-direction: column; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <header>
+    <p class="logo">// url shortener</p>
+    <h1>Длинные ссылки —<br><span>короткий путь</span></h1>
+    <p class="subtitle">Сокращай, управляй, смотри статистику</p>
+  </header>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('create')">Создать</button>
+    <button class="tab" onclick="switchTab('manage')">Управление</button>
+    <button class="tab" onclick="switchTab('history')">История</button>
+  </div>
+
+  <!-- ══ TAB: CREATE ══ -->
+  <div class="card active" id="tab-create">
+    <p class="section-title">Новая короткая ссылка</p>
+
+    <div class="field">
+      <label for="url-input">Длинная ссылка</label>
+      <input id="url-input" type="url" placeholder="https://example.com/very/long/url/..." />
+    </div>
+
+    <div class="field">
+      <label for="days-input">Срок действия (дней)</label>
+      <input id="days-input" type="number" placeholder="Необязательно — оставь пустым для бессрочной" min="1" max="365" />
+    </div>
+
+    <div id="create-msg" class="msg"></div>
+    <button class="btn" id="create-btn" onclick="createLink()">Сократить ссылку →</button>
+
+    <!-- Result -->
+    <div id="create-result" class="result-box">
+      <p class="section-title">Готово</p>
+
+      <div class="result-url-row">
+        <a id="result-short-url" href="#" target="_blank"></a>
+        <button class="btn btn-ghost btn-sm" onclick="copyShortUrl()">Копировать</button>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-cell">
+          <div class="stat-val" id="result-clicks">0</div>
+          <div class="stat-key">Переходов</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-val" id="result-expires">∞</div>
+          <div class="stat-key">Истекает</div>
+        </div>
+      </div>
+
+      <div class="row">
+        <button class="btn btn-ghost btn-sm" onclick="goToManage()">Управление →</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteFromCreate()">Удалить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: MANAGE ══ -->
+  <div class="card" id="tab-manage">
+    <p class="section-title">Управление ссылкой</p>
+
+    <div class="row">
+      <div class="field">
+        <label for="manage-code">Short Code</label>
+        <input id="manage-code" type="text" placeholder="например: abc12345" maxlength="8" />
+      </div>
+      <div style="display:flex; align-items:flex-end;">
+        <button class="btn btn-sm" style="width:auto; white-space:nowrap;" onclick="loadLinkInfo()">Найти</button>
+      </div>
+    </div>
+
+    <div id="manage-msg" class="msg"></div>
+
+    <!-- Info -->
+    <div id="manage-info" style="display:none; flex-direction:column; gap:14px;">
+      <hr />
+      <p class="section-title">Информация о ссылке</p>
+
+      <div class="info-table">
+        <div class="info-row">
+          <span class="info-key">Short Code</span>
+          <span class="info-val accent" id="info-code">—</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">Короткая ссылка</span>
+          <span class="info-val" id="info-short">—</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">Оригинальная</span>
+          <span class="info-val" id="info-original">—</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">Создана</span>
+          <span class="info-val" id="info-created">—</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">Истекает</span>
+          <span class="info-val" id="info-expires">—</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">Статус</span>
+          <span class="info-val" id="info-status">—</span>
+        </div>
+      </div>
+
+      <hr />
+      <p class="section-title">Статистика</p>
+
+      <div class="stats-grid">
+        <div class="stat-cell">
+          <div class="stat-val" id="info-clicks">—</div>
+          <div class="stat-key">Всего переходов</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-val" id="info-short-code-display">—</div>
+          <div class="stat-key">Short code</div>
+        </div>
+      </div>
+
+      <hr />
+
+      <div class="row">
+        <button class="btn btn-ghost" onclick="refreshStats()">Обновить статистику</button>
+        <button class="btn btn-danger" onclick="deleteLink()">Удалить ссылку</button>
+      </div>
+
+      <div id="delete-msg" class="msg"></div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: HISTORY ══ -->
+  <div class="card" id="tab-history">
+    <p class="section-title">Созданные в этой сессии</p>
+    <p style="font-size:12px; color:var(--muted);">История хранится только пока страница открыта. При перезагрузке очищается.</p>
+    <div id="history-list" class="history-list">
+      <p class="history-empty">Пока нет созданных ссылок</p>
+    </div>
+    <button class="btn btn-ghost" id="clear-history-btn" style="display:none;" onclick="clearHistory()">Очистить историю</button>
+  </div>
+
+</div>
+
+<script>
+  const BASE = 'http://localhost:8080';
+  let createdShortCode = null;
+  const history = [];
+
+  // ── Tabs ──
+  function switchTab(name) {
+    document.querySelectorAll('.tab').forEach((t, i) => {
+      t.classList.toggle('active', ['create','manage','history'][i] === name);
+    });
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+  }
+
+  // ── Create ──
+  async function createLink() {
+    const url  = document.getElementById('url-input').value.trim();
+    const days = document.getElementById('days-input').value;
+    const btn  = document.getElementById('create-btn');
+    const msg  = document.getElementById('create-msg');
+
+    clearMsg(msg);
+    document.getElementById('create-result').classList.remove('visible');
+
+    if (!url) { showMsg(msg, 'error', 'Введите ссылку'); return; }
+
+    btn.disabled = true;
+    btn.textContent = 'Создаём...';
+
+    try {
+      const body = { originalUrl: url };
+      if (days) body.daysToExpire = parseInt(days);
+
+      const res  = await fetch(`${BASE}/api/links`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        const text = data.originalUrl || data.message || `Ошибка ${res.status}`;
+        showMsg(msg, 'error', text);
+        return;
+      }
+
+      const data = await res.json();
+      createdShortCode = data.shortCode;
+
+      // Показываем результат
+      const linkEl = document.getElementById('result-short-url');
+      const shortUrl = `${BASE}/${data.shortCode}`;
+      linkEl.href = shortUrl;
+      linkEl.textContent = shortUrl;
+
+      const expiresEl = document.getElementById('result-expires');
+      expiresEl.textContent = data.expiresAt
+        ? new Date(data.expiresAt).toLocaleDateString('ru-RU')
+        : '∞';
+
+      document.getElementById('result-clicks').textContent = '0';
+      document.getElementById('create-result').classList.add('visible');
+
+      // Добавляем в историю
+      addToHistory({ shortCode: data.shortCode, originalUrl: url, shortUrl, expiresAt: data.expiresAt });
+
+      showMsg(msg, 'success', 'Ссылка создана успешно');
+
+    } catch (e) {
+      showMsg(msg, 'error', 'Не удалось подключиться к серверу');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Сократить ссылку →';
+    }
+  }
+
+  function copyShortUrl() {
+    const url = document.getElementById('result-short-url').textContent;
+    navigator.clipboard.writeText(url).then(() => {
+      const btn = document.querySelector('.result-url-row .btn-ghost');
+      btn.textContent = 'Скопировано ✓';
+      setTimeout(() => btn.textContent = 'Копировать', 1600);
+    });
+  }
+
+  function goToManage() {
+    if (!createdShortCode) return;
+    document.getElementById('manage-code').value = createdShortCode;
+    switchTab('manage');
+    loadLinkInfo();
+  }
+
+  async function deleteFromCreate() {
+    if (!createdShortCode) return;
+    await performDelete(createdShortCode, document.getElementById('create-msg'));
+    document.getElementById('create-result').classList.remove('visible');
+    createdShortCode = null;
+  }
+
+  // ── Manage ──
+  async function loadLinkInfo() {
+    const code = document.getElementById('manage-code').value.trim();
+    const msg  = document.getElementById('manage-msg');
+    const info = document.getElementById('manage-info');
+
+    clearMsg(msg);
+    info.style.display = 'none';
+
+    if (!code) { showMsg(msg, 'error', 'Введите short code'); return; }
+
+    try {
+      // Инфо о ссылке
+      const resInfo = await fetch(`${BASE}/api/links/${code}`);
+      if (!resInfo.ok) {
+        showMsg(msg, 'error', resInfo.status === 404 ? 'Ссылка не найдена' : `Ошибка ${resInfo.status}`);
+        return;
+      }
+      const d = await resInfo.json();
+
+      document.getElementById('info-code').textContent     = d.shortCode;
+      document.getElementById('info-short').textContent    = `${BASE}/${d.shortCode}`;
+      document.getElementById('info-original').textContent = d.originalUrl;
+      document.getElementById('info-created').textContent  = d.createdAt
+        ? new Date(d.createdAt).toLocaleString('ru-RU') : '—';
+      document.getElementById('info-expires').textContent  = d.expiresAt
+        ? new Date(d.expiresAt).toLocaleString('ru-RU') : 'Бессрочная';
+
+      // Статус
+      const statusEl = document.getElementById('info-status');
+      const isExpired = d.expiresAt && new Date(d.expiresAt) < new Date();
+      statusEl.innerHTML = isExpired
+        ? '<span class="badge badge-expired">Истекла</span>'
+        : '<span class="badge badge-ok">Активна</span>';
+
+      document.getElementById('info-short-code-display').textContent = d.shortCode;
+
+      // Статистика
+      await loadStats(code);
+
+      info.style.display = 'flex';
+      clearMsg(document.getElementById('delete-msg'));
+
+    } catch (e) {
+      showMsg(msg, 'error', 'Не удалось подключиться к серверу');
+    }
+  }
+
+  async function loadStats(code) {
+    try {
+      const res = await fetch(`${BASE}/api/links/${code}/stats`);
+      if (!res.ok) return;
+      const d = await res.json();
+      document.getElementById('info-clicks').textContent = d.clicks ?? 0;
+    } catch (_) {}
+  }
+
+  async function refreshStats() {
+    const code = document.getElementById('manage-code').value.trim();
+    if (!code) return;
+    await loadStats(code);
+    showMsg(document.getElementById('manage-msg'), 'success', 'Статистика обновлена');
+    setTimeout(() => clearMsg(document.getElementById('manage-msg')), 2000);
+  }
+
+  async function deleteLink() {
+    const code = document.getElementById('manage-code').value.trim();
+    if (!code) return;
+    const done = await performDelete(code, document.getElementById('delete-msg'));
+    if (done) {
+      document.getElementById('manage-info').style.display = 'none';
+      removeFromHistory(code);
+    }
+  }
+
+  async function performDelete(code, msgEl) {
+    try {
+      const res = await fetch(`${BASE}/api/links/${code}`, { method: 'DELETE' });
+      if (res.ok || res.status === 204) {
+        showMsg(msgEl, 'success', 'Ссылка удалена');
+        removeFromHistory(code);
+        return true;
+      } else if (res.status === 404) {
+        showMsg(msgEl, 'error', 'Ссылка не найдена');
+      } else {
+        showMsg(msgEl, 'error', `Ошибка ${res.status}`);
+      }
+    } catch (e) {
+      showMsg(msgEl, 'error', 'Не удалось подключиться к серверу');
+    }
+    return false;
+  }
+
+  // ── History ──
+  function addToHistory(item) {
+    history.unshift(item);
+    renderHistory();
+  }
+
+  function removeFromHistory(code) {
+    const idx = history.findIndex(h => h.shortCode === code);
+    if (idx !== -1) history.splice(idx, 1);
+    renderHistory();
+  }
+
+  function clearHistory() {
+    history.length = 0;
+    renderHistory();
+  }
+
+  function renderHistory() {
+    const list = document.getElementById('history-list');
+    const clearBtn = document.getElementById('clear-history-btn');
+
+    if (history.length === 0) {
+      list.innerHTML = '<p class="history-empty">Пока нет созданных ссылок</p>';
+      clearBtn.style.display = 'none';
+      return;
+    }
+
+    clearBtn.style.display = 'block';
+    list.innerHTML = history.map(h => `
+      <div class="history-item" onclick="openManage('${h.shortCode}')">
+        <span class="history-code">${h.shortCode}</span>
+        <span class="history-url">${h.originalUrl}</span>
+        <span style="font-size:10px; color:var(--muted); white-space:nowrap;">
+          ${h.expiresAt ? new Date(h.expiresAt).toLocaleDateString('ru-RU') : '∞'}
+        </span>
+      </div>
+    `).join('');
+  }
+
+  function openManage(code) {
+    document.getElementById('manage-code').value = code;
+    switchTab('manage');
+    loadLinkInfo();
+  }
+
+  // ── Utils ──
+  function showMsg(el, type, text) {
+    el.className = `msg ${type}`;
+    el.textContent = text;
+  }
+
+  function clearMsg(el) {
+    el.className = 'msg';
+    el.textContent = '';
+  }
+
+  // Enter для создания
+  document.getElementById('url-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') createLink();
+  });
+  document.getElementById('manage-code').addEventListener('keydown', e => {
+    if (e.key === 'Enter') loadLinkInfo();
+  });
+</script>
+</body>
+</html>

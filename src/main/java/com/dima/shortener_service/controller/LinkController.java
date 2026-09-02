@@ -52,6 +52,6 @@ public class LinkController {
     @GetMapping("/api/links/{shortCode}/stats")
     public ResponseEntity<Map<String, Long>> getLinkStats(@PathVariable String shortCode) {
         long clicks = linkService.getClickCount(shortCode);
-        return ResponseEntity.ok(Map.of("Clicks", clicks));
+        return ResponseEntity.ok(Map.of("clicks", clicks));
     }
 }

@@ -8,6 +8,7 @@ import com.dima.shortener_service.entity.Link;
 import com.dima.shortener_service.exception.LinkExpiredException;
 import com.dima.shortener_service.exception.LinkNotFoundException;
 import com.dima.shortener_service.repository.LinkRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -82,6 +83,7 @@ public class LinkService {
         return link.getClicks();
     }
 
+    @Transactional
     public void deleteLink(String shortCode) {
         linkRepository.deleteByShortCode(shortCode);
     }
