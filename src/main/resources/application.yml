@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/shortener_db
-    username: postgres
-    password: postgres
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -14,4 +14,4 @@ spring:
     change-log: classpath:db/changelog/db.changelog-master.yaml
 
 app:
-  base-url: http://localhost:8080
+  base-url: ${APP_BASE_URL}
