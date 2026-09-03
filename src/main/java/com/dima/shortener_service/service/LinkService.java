@@ -10,6 +10,8 @@ import com.dima.shortener_service.exception.LinkNotFoundException;
 import com.dima.shortener_service.repository.LinkRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -42,6 +44,7 @@ public class LinkService {
         return response;
     }
 
+    @Cacheable(value = "links", key = "#shortCode")
     public String getOriginalUrl(String shortCode) {
         Link link = linkRepository
                 .findByShortCode(shortCode)
@@ -51,10 +54,16 @@ public class LinkService {
             throw new LinkExpiredException("Link has expired");
         }
 
+        return link.getOriginalUrl();
+    }
+
+    public void incrementClickCount(String shortCode) {
+        Link link = linkRepository
+                .findByShortCode(shortCode)
+                .orElseThrow(() -> new LinkNotFoundException("Link not found"));
+
         link.setClicks(link.getClicks() + 1);
         linkRepository.save(link);
-
-        return link.getOriginalUrl();
     }
 
     public LinkInfoResponse getLinkInfo(String shortCode) {
@@ -84,6 +93,7 @@ public class LinkService {
     }
 
     @Transactional
+    @CacheEvict(value = "links", key = "#shortCode")
     public void deleteLink(String shortCode) {
         linkRepository.deleteByShortCode(shortCode);
     }

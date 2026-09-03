@@ -31,7 +31,7 @@ public class LinkController {
     @GetMapping("/r/{shortCode}")
     public ResponseEntity<Void> redirectToOriginalUrl(@PathVariable String shortCode) {
         String originalUrl = linkService.getOriginalUrl(shortCode);
-
+        linkService.incrementClickCount(shortCode);
         return ResponseEntity
                 .status(HttpStatus.FOUND)
                 .location(URI.create(originalUrl))
