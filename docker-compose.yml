@@ -9,6 +9,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
       - APP_BASE_URL=${BASE_URL}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_HOST=redis
     depends_on:
       db:
           condition: service_healthy
