@@ -2,6 +2,7 @@ package com.dima.shortener_service.service;
 
 
 import com.dima.shortener_service.dto.CreateLinkRequest;
+import com.dima.shortener_service.dto.LinkClickedEvent;
 import com.dima.shortener_service.dto.LinkInfoResponse;
 import com.dima.shortener_service.dto.LinkResponse;
 import com.dima.shortener_service.entity.Link;
@@ -12,6 +13,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -22,11 +24,14 @@ import java.util.UUID;
 public class LinkService {
     private final LinkRepository linkRepository;
 
+    private final KafkaTemplate<String, LinkClickedEvent> kafkaTemplate;
+
     @Value("${app.base-url}")
     private String baseUrl;
 
-    public LinkService(LinkRepository linkRepository) {
+    public LinkService(LinkRepository linkRepository, KafkaTemplate<String, LinkClickedEvent> kafkaTemplate) {
         this.linkRepository = linkRepository;
+        this.kafkaTemplate = kafkaTemplate;
     }
 
     public LinkResponse createLink(CreateLinkRequest request) {
@@ -45,7 +50,7 @@ public class LinkService {
     }
 
     @Cacheable(value = "links", key = "#shortCode")
-    public String getOriginalUrl(String shortCode) {
+    public String getOriginalUrl(String shortCode, String userAgent) {
         Link link = linkRepository
                 .findByShortCode(shortCode)
                 .orElseThrow(() -> new LinkNotFoundException("Link not found"));
@@ -53,6 +58,15 @@ public class LinkService {
         if (link.isExpired()) {
             throw new LinkExpiredException("Link has expired");
         }
+
+        kafkaTemplate.send(
+                "link-clicked",
+                new LinkClickedEvent(
+                        shortCode,
+                        link.getOriginalUrl(),
+                        Instant.now(), userAgent,
+                        UUID.randomUUID().toString())
+        );
 
         return link.getOriginalUrl();
     }
