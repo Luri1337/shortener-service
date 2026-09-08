@@ -1,12 +1,18 @@
 package com.dima.shortener_service.dto;
 
-import java.time.Instant;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-public record LinkClickedEvent(
-        String shortCode,
-        String originalUrl,
-        Instant clickedAt,
-        String userAgent,
-        String correlationId
-) {
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+public class LinkClickedEvent {
+    private String shortCode;
+    private String originalUrl;
+    private String clickedAt;
+    private String userAgent;
+    private String correlationId;
 }

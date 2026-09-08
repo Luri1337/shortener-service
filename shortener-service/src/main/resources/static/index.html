@@ -33,7 +33,6 @@
       padding: 32px 16px 64px;
     }
 
-    /* ── Layout ── */
     .container {
       max-width: 640px;
       margin: 0 auto;
@@ -42,7 +41,6 @@
       gap: 20px;
     }
 
-    /* ── Header ── */
     header { text-align: center; padding: 12px 0 8px; }
 
     .logo {
@@ -65,7 +63,6 @@
 
     .subtitle { margin-top: 8px; color: var(--muted); font-size: 14px; }
 
-    /* ── Tabs ── */
     .tabs {
       display: flex;
       gap: 4px;
@@ -99,7 +96,6 @@
       border: 1px solid rgba(0,212,255,0.25);
     }
 
-    /* ── Card ── */
     .card {
       background: var(--panel);
       border: 1px solid var(--border);
@@ -112,7 +108,6 @@
 
     .card.active { display: flex; }
 
-    /* ── Section title ── */
     .section-title {
       font-size: 11px;
       font-weight: 700;
@@ -123,7 +118,6 @@
       border-bottom: 1px solid var(--border);
     }
 
-    /* ── Form elements ── */
     .field { display: flex; flex-direction: column; gap: 7px; }
 
     label {
@@ -155,7 +149,6 @@
     .row { display: flex; gap: 12px; }
     .row .field { flex: 1; }
 
-    /* ── Buttons ── */
     .btn {
       background: var(--accent);
       color: #0F1117;
@@ -198,7 +191,6 @@
       border-radius: 6px;
     }
 
-    /* ── Messages ── */
     .msg {
       font-size: 13px;
       padding: 10px 14px;
@@ -209,7 +201,6 @@
     .msg.error   { display: block; color: var(--error);   background: var(--error-dim);   border: 1px solid rgba(255,83,112,0.25); }
     .msg.success { display: block; color: var(--success); background: var(--success-dim); border: 1px solid rgba(61,220,132,0.25); }
 
-    /* ── Result box ── */
     .result-box {
       background: var(--accent-dim);
       border: 1px solid rgba(0,212,255,0.3);
@@ -240,7 +231,6 @@
 
     .result-url-row a:hover { text-decoration: underline; }
 
-    /* ── Stats grid ── */
     .stats-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -269,7 +259,6 @@
       margin-top: 3px;
     }
 
-    /* ── Info table ── */
     .info-table { display: flex; flex-direction: column; gap: 8px; }
 
     .info-row {
@@ -301,7 +290,6 @@
 
     .info-val.accent { color: var(--accent); }
 
-    /* ── Badge ── */
     .badge {
       display: inline-block;
       font-size: 10px;
@@ -314,10 +302,8 @@
     .badge-ok      { background: var(--success-dim); color: var(--success); border: 1px solid rgba(61,220,132,0.3); }
     .badge-expired { background: var(--error-dim);   color: var(--error);   border: 1px solid rgba(255,83,112,0.3); }
 
-    /* ── Divider ── */
     hr { border: none; border-top: 1px solid var(--border); }
 
-    /* ── Links history ── */
     .history-empty {
       text-align: center;
       color: var(--muted);
@@ -367,14 +353,12 @@
 <body>
 <div class="container">
 
-  <!-- Header -->
   <header>
     <p class="logo">// url shortener</p>
     <h1>Длинные ссылки —<br><span>короткий путь</span></h1>
     <p class="subtitle">Сокращай, управляй, смотри статистику</p>
   </header>
 
-  <!-- Tabs -->
   <div class="tabs">
     <button class="tab active" onclick="switchTab('create')">Создать</button>
     <button class="tab" onclick="switchTab('manage')">Управление</button>
@@ -398,7 +382,6 @@
     <div id="create-msg" class="msg"></div>
     <button class="btn" id="create-btn" onclick="createLink()">Сократить ссылку →</button>
 
-    <!-- Result -->
     <div id="create-result" class="result-box">
       <p class="section-title">Готово</p>
 
@@ -441,7 +424,6 @@
 
     <div id="manage-msg" class="msg"></div>
 
-    <!-- Info -->
     <div id="manage-info" style="display:none; flex-direction:column; gap:14px;">
       <hr />
       <p class="section-title">Информация о ссылке</p>
@@ -474,7 +456,7 @@
       </div>
 
       <hr />
-      <p class="section-title">Статистика</p>
+      <p class="section-title">Аналитика</p>
 
       <div class="stats-grid">
         <div class="stat-cell">
@@ -482,8 +464,8 @@
           <div class="stat-key">Всего переходов</div>
         </div>
         <div class="stat-cell">
-          <div class="stat-val" id="info-short-code-display">—</div>
-          <div class="stat-key">Short code</div>
+          <div class="stat-val" id="info-last-clicked">—</div>
+          <div class="stat-key">Последний клик</div>
         </div>
       </div>
 
@@ -515,7 +497,6 @@
   let createdShortCode = null;
   const history = [];
 
-  // ── Tabs ──
   function switchTab(name) {
     document.querySelectorAll('.tab').forEach((t, i) => {
       t.classList.toggle('active', ['create','manage','history'][i] === name);
@@ -524,7 +505,6 @@
     document.getElementById('tab-' + name).classList.add('active');
   }
 
-  // ── Create ──
   async function createLink() {
     const url  = document.getElementById('url-input').value.trim();
     const days = document.getElementById('days-input').value;
@@ -543,7 +523,7 @@
       const body = { originalUrl: url };
       if (days) body.daysToExpire = parseInt(days);
 
-      const res  = await fetch(`${BASE}/api/links`, {
+      const res = await fetch(`${BASE}/api/links`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
@@ -559,7 +539,6 @@
       const data = await res.json();
       createdShortCode = data.shortCode;
 
-      // Показываем результат
       const linkEl = document.getElementById('result-short-url');
       const shortUrl = `${BASE}/r/${data.shortCode}`;
       linkEl.href = shortUrl;
@@ -567,15 +546,13 @@
 
       const expiresEl = document.getElementById('result-expires');
       expiresEl.textContent = data.expiresAt
-        ? new Date(data.expiresAt).toLocaleDateString('ru-RU')
-        : '∞';
+              ? new Date(data.expiresAt).toLocaleDateString('ru-RU')
+              : '∞';
 
       document.getElementById('result-clicks').textContent = '0';
       document.getElementById('create-result').classList.add('visible');
 
-      // Добавляем в историю
       addToHistory({ shortCode: data.shortCode, originalUrl: url, shortUrl, expiresAt: data.expiresAt });
-
       showMsg(msg, 'success', 'Ссылка создана успешно');
 
     } catch (e) {
@@ -609,7 +586,6 @@
     createdShortCode = null;
   }
 
-  // ── Manage ──
   async function loadLinkInfo() {
     const code = document.getElementById('manage-code').value.trim();
     const msg  = document.getElementById('manage-msg');
@@ -621,7 +597,6 @@
     if (!code) { showMsg(msg, 'error', 'Введите short code'); return; }
 
     try {
-      // Инфо о ссылке
       const resInfo = await fetch(`${BASE}/api/links/${code}`);
       if (!resInfo.ok) {
         showMsg(msg, 'error', resInfo.status === 404 ? 'Ссылка не найдена' : `Ошибка ${resInfo.status}`);
@@ -633,20 +608,17 @@
       document.getElementById('info-short').textContent    = `${BASE}/r/${d.shortCode}`;
       document.getElementById('info-original').textContent = d.originalUrl;
       document.getElementById('info-created').textContent  = d.createdAt
-        ? new Date(d.createdAt).toLocaleString('ru-RU') : '—';
+              ? new Date(d.createdAt).toLocaleString('ru-RU') : '—';
       document.getElementById('info-expires').textContent  = d.expiresAt
-        ? new Date(d.expiresAt).toLocaleString('ru-RU') : 'Бессрочная';
+              ? new Date(d.expiresAt).toLocaleString('ru-RU') : 'Бессрочная';
 
-      // Статус
       const statusEl = document.getElementById('info-status');
       const isExpired = d.expiresAt && new Date(d.expiresAt) < new Date();
       statusEl.innerHTML = isExpired
-        ? '<span class="badge badge-expired">Истекла</span>'
-        : '<span class="badge badge-ok">Активна</span>';
+              ? '<span class="badge badge-expired">Истекла</span>'
+              : '<span class="badge badge-ok">Активна</span>';
 
-      document.getElementById('info-short-code-display').textContent = d.shortCode;
-
-      // Статистика
+      // Аналитика из analytics-service
       await loadStats(code);
 
       info.style.display = 'flex';
@@ -657,12 +629,16 @@
     }
   }
 
+  // ── Обновлено: теперь использует /analytics вместо /stats ──
   async function loadStats(code) {
     try {
-      const res = await fetch(`${BASE}/api/links/${code}/stats`);
+      const res = await fetch(`${BASE}/api/links/${code}/analytics`);
       if (!res.ok) return;
       const d = await res.json();
-      document.getElementById('info-clicks').textContent = d.clicks ?? 0;
+      document.getElementById('info-clicks').textContent = d.totalClicks ?? 0;
+      document.getElementById('info-last-clicked').textContent = d.lastClickedAt
+              ? new Date(d.lastClickedAt).toLocaleString('ru-RU')
+              : '—';
     } catch (_) {}
   }
 
@@ -702,7 +678,6 @@
     return false;
   }
 
-  // ── History ──
   function addToHistory(item) {
     history.unshift(item);
     renderHistory();
@@ -747,7 +722,6 @@
     loadLinkInfo();
   }
 
-  // ── Utils ──
   function showMsg(el, type, text) {
     el.className = `msg ${type}`;
     el.textContent = text;
@@ -758,7 +732,6 @@
     el.textContent = '';
   }
 
-  // Enter для создания
   document.getElementById('url-input').addEventListener('keydown', e => {
     if (e.key === 'Enter') createLink();
   });

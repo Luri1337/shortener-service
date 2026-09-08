@@ -21,11 +21,17 @@ spring:
       connect-timeout: 500ms
       timeout: 500ms
 
-  Kafka:
+  kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false
+
+  analytics:
+    service-url: ${ANALYTICS_SERVICE_URL:http://localhost:8081}
+
 
 app:
   base-url: ${APP_BASE_URL}

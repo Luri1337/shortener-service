@@ -1,5 +1,6 @@
 package com.dima.shortener_service.controller;
 
+import com.dima.shortener_service.dto.AnalyticsResponse;
 import com.dima.shortener_service.dto.CreateLinkRequest;
 import com.dima.shortener_service.dto.LinkInfoResponse;
 import com.dima.shortener_service.dto.LinkResponse;
@@ -46,15 +47,14 @@ public class LinkController {
         return ResponseEntity.ok(linkService.getLinkInfo(shortCode));
     }
 
+    @GetMapping("/api/links/{shortCode}/analytics")
+    public ResponseEntity<AnalyticsResponse> getLinkAnalytics(@PathVariable String shortCode) {
+        return ResponseEntity.ok(linkService.getLinkAnalytics(shortCode));
+    }
+
     @DeleteMapping("/api/links/{shortCode}")
     public ResponseEntity<Void> deleteLink(@PathVariable String shortCode) {
         linkService.deleteLink(shortCode);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
-
-    @GetMapping("/api/links/{shortCode}/stats")
-    public ResponseEntity<Map<String, Long>> getLinkStats(@PathVariable String shortCode) {
-        long clicks = linkService.getClickCount(shortCode);
-        return ResponseEntity.ok(Map.of("clicks", clicks));
     }
 }
