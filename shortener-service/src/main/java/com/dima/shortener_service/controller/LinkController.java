@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.Map;
 
 @RestController
 public class LinkController {
@@ -34,8 +33,8 @@ public class LinkController {
             @PathVariable String shortCode,
             @RequestHeader(value = "User-Agent", defaultValue = "unknown") String userAgent) {
 
-        String originalUrl = linkService.getOriginalUrl(shortCode, userAgent);
-        linkService.incrementClickCount(shortCode);
+        String originalUrl = linkService.getOriginalUrl(shortCode);
+        linkService.publishLinkClickedEvent(shortCode, originalUrl, userAgent);
         return ResponseEntity
                 .status(HttpStatus.FOUND)
                 .location(URI.create(originalUrl))

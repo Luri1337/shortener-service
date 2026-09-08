@@ -14,7 +14,10 @@ public class ClickEventConsumer {
         this.analyticsService = analyticsService;
     }
 
-    @KafkaListener(topics = "link-clicks", groupId = "analytics-service")
+    @KafkaListener(topics = "link-clicks",
+            groupId = "analytics-service",
+            containerFactory = "kafkaListenerContainerFactory"
+    )
     public void consume(LinkClickedEvent clickedEvent) {
         analyticsService.processClickEvent(clickedEvent);
     }

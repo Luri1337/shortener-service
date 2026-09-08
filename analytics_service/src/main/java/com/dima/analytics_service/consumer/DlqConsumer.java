@@ -9,7 +9,11 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class DlqConsumer {
-    @KafkaListener(topics = "link-clicks-dead-letter", groupId = "analytics-service")
+    @KafkaListener(
+            topics = "link-clicks-dead-letter",
+            groupId = "analytics-service-dlq",
+            containerFactory = "dlqKafkaListenerContainerFactory"
+    )
     public void consume(
             byte[] message,
             @Header(KafkaHeaders.EXCEPTION_MESSAGE) String errorMessage) {

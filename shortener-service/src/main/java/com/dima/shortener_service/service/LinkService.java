@@ -53,7 +53,7 @@ public class LinkService {
     }
 
     @Cacheable(value = "links", key = "#shortCode")
-    public String getOriginalUrl(String shortCode, String userAgent) {
+    public String getOriginalUrl(String shortCode) {
         Link link = linkRepository
                 .findByShortCode(shortCode)
                 .orElseThrow(() -> new LinkNotFoundException("Link not found"));
@@ -62,24 +62,17 @@ public class LinkService {
             throw new LinkExpiredException("Link has expired");
         }
 
-        linkEventProducer.produceLinkEvent(
-                new LinkClickedEvent(
-                        shortCode,
-                        link.getOriginalUrl(),
-                        Instant.now().toString(), userAgent,
-                        UUID.randomUUID().toString())
-        );
-
         return link.getOriginalUrl();
     }
 
-    public void incrementClickCount(String shortCode) {
-        Link link = linkRepository
-                .findByShortCode(shortCode)
-                .orElseThrow(() -> new LinkNotFoundException("Link not found"));
-
-        link.setClicks(link.getClicks() + 1);
-        linkRepository.save(link);
+    public void publishLinkClickedEvent(String shortCode, String originalUrl, String userAgent) {
+        linkEventProducer.produceLinkEvent(
+                new LinkClickedEvent(
+                        shortCode,
+                        originalUrl,
+                        Instant.now().toString(), userAgent,
+                        UUID.randomUUID().toString())
+        );
     }
 
     public LinkInfoResponse getLinkInfo(String shortCode) {
@@ -101,12 +94,12 @@ public class LinkService {
     }
 
     public AnalyticsResponse getLinkAnalytics(String shortCode) {
-        try{
+        try {
             return restClient.get()
                     .uri("/api/analytics/{shortCode}", shortCode)
                     .retrieve()
                     .body(AnalyticsResponse.class);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.warn("Analytics service is unavailable: {}", e.getMessage());
             return new AnalyticsResponse(shortCode, 0L, null);
         }
