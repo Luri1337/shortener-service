@@ -1,4 +1,9 @@
 package com.dima.analytics_service.dto;
 
-public record AnalyticsResponse() {
-}
+import java.time.Instant;
+
+public record AnalyticsResponse(
+        String shortCode,
+        Long totalClicks,
+        Instant lastClickAt
+) {}
