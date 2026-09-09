@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -25,15 +24,13 @@ public class LinkService {
     private final LinkRepository linkRepository;
 
     private final LinkEventProducer linkEventProducer;
-    private final RestClient restClient;
 
     @Value("${app.base-url}")
     private String baseUrl;
 
-    public LinkService(LinkRepository linkRepository, LinkEventProducer linkEventProducer, RestClient restClient) {
+    public LinkService(LinkRepository linkRepository, LinkEventProducer linkEventProducer) {
         this.linkRepository = linkRepository;
         this.linkEventProducer = linkEventProducer;
-        this.restClient = restClient;
     }
 
     public LinkResponse createLink(CreateLinkRequest request) {
@@ -91,18 +88,6 @@ public class LinkService {
         response.setShortUrl(baseUrl + "/" + link.getShortCode());
 
         return response;
-    }
-
-    public AnalyticsResponse getLinkAnalytics(String shortCode) {
-        try {
-            return restClient.get()
-                    .uri("/api/analytics/{shortCode}", shortCode)
-                    .retrieve()
-                    .body(AnalyticsResponse.class);
-        } catch (Exception e) {
-            log.warn("Analytics service is unavailable: {}", e.getMessage());
-            return new AnalyticsResponse(shortCode, 0L, null);
-        }
     }
 
     @Transactional

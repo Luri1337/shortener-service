@@ -1,5 +1,6 @@
 package com.dima.shortener_service.controller;
 
+import com.dima.shortener_service.client.AnalyticsClient;
 import com.dima.shortener_service.dto.AnalyticsResponse;
 import com.dima.shortener_service.dto.CreateLinkRequest;
 import com.dima.shortener_service.dto.LinkInfoResponse;
@@ -17,8 +18,11 @@ public class LinkController {
 
     private final LinkService linkService;
 
-    public LinkController(LinkService linkService) {
+    private final AnalyticsClient analyticsClient;
+
+    public LinkController(LinkService linkService, AnalyticsClient analyticsClient) {
         this.linkService = linkService;
+        this.analyticsClient = analyticsClient;
     }
 
     @PostMapping("/api/links")
@@ -48,7 +52,7 @@ public class LinkController {
 
     @GetMapping("/api/links/{shortCode}/analytics")
     public ResponseEntity<AnalyticsResponse> getLinkAnalytics(@PathVariable String shortCode) {
-        return ResponseEntity.ok(linkService.getLinkAnalytics(shortCode));
+        return ResponseEntity.ok(analyticsClient.getLinkAnalytics(shortCode));
     }
 
     @DeleteMapping("/api/links/{shortCode}")
