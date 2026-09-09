@@ -7,12 +7,14 @@ import com.dima.shortener_service.dto.LinkInfoResponse;
 import com.dima.shortener_service.dto.LinkResponse;
 import com.dima.shortener_service.service.LinkService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 
+@Slf4j
 @RestController
 public class LinkController {
 
@@ -38,7 +40,11 @@ public class LinkController {
             @RequestHeader(value = "User-Agent", defaultValue = "unknown") String userAgent) {
 
         String originalUrl = linkService.getOriginalUrl(shortCode);
+
+        log.info("Redirecting shortcode: {} to: {}", shortCode, originalUrl);
+
         linkService.publishLinkClickedEvent(shortCode, originalUrl, userAgent);
+
         return ResponseEntity
                 .status(HttpStatus.FOUND)
                 .location(URI.create(originalUrl))

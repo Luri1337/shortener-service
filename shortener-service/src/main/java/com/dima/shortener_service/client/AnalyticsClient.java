@@ -2,6 +2,8 @@ package com.dima.shortener_service.client;
 
 import com.dima.shortener_service.dto.AnalyticsResponse;
 import lombok.extern.slf4j.Slf4j;
+
+import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
@@ -18,6 +20,7 @@ public class AnalyticsClient {
         try {
             return restClient.get()
                     .uri("/api/analytics/{shortCode}", shortCode)
+                    .header("X-Correlation-ID", MDC.get("correlationId"))
                     .retrieve()
                     .body(AnalyticsResponse.class);
         } catch (Exception e) {

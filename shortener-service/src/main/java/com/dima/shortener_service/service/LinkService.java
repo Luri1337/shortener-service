@@ -9,6 +9,7 @@ import com.dima.shortener_service.producer.LinkEventProducer;
 import com.dima.shortener_service.repository.LinkRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -34,6 +35,8 @@ public class LinkService {
     }
 
     public LinkResponse createLink(CreateLinkRequest request) {
+        log.info("Link crated with original URL: {}", request.getOriginalUrl());
+
         Link link = Link.builder()
                 .originalUrl(request.getOriginalUrl())
                 .expiresAt(countDownExpiration(request.getDaysToExpire()))
@@ -56,6 +59,7 @@ public class LinkService {
                 .orElseThrow(() -> new LinkNotFoundException("Link not found"));
 
         if (link.isExpired()) {
+            log.warn("Link expired with shortcode: {}", shortCode);
             throw new LinkExpiredException("Link has expired");
         }
 
@@ -63,12 +67,15 @@ public class LinkService {
     }
 
     public void publishLinkClickedEvent(String shortCode, String originalUrl, String userAgent) {
+        String correlationId = MDC.get("correlationId");
+
         linkEventProducer.produceLinkEvent(
                 new LinkClickedEvent(
                         shortCode,
                         originalUrl,
-                        Instant.now().toString(), userAgent,
-                        UUID.randomUUID().toString())
+                        Instant.now().toString(),
+                        userAgent,
+                        correlationId)
         );
     }
 
@@ -93,6 +100,7 @@ public class LinkService {
     @Transactional
     @CacheEvict(value = "links", key = "#shortCode")
     public void deleteLink(String shortCode) {
+        log.info("Deleting link with short code: {}", shortCode);
         linkRepository.deleteByShortCode(shortCode);
     }
 
