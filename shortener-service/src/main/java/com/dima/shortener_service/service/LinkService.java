@@ -7,6 +7,8 @@ import com.dima.shortener_service.exception.LinkExpiredException;
 import com.dima.shortener_service.exception.LinkNotFoundException;
 import com.dima.shortener_service.producer.LinkEventProducer;
 import com.dima.shortener_service.repository.LinkRepository;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -26,12 +28,23 @@ public class LinkService {
 
     private final LinkEventProducer linkEventProducer;
 
+    private final Counter linksClickCounter;
+    private final Counter linksCreateCounter;
+
     @Value("${app.base-url}")
     private String baseUrl;
 
-    public LinkService(LinkRepository linkRepository, LinkEventProducer linkEventProducer) {
+    public LinkService(LinkRepository linkRepository, LinkEventProducer linkEventProducer, MeterRegistry meterRegistry) {
         this.linkRepository = linkRepository;
         this.linkEventProducer = linkEventProducer;
+
+        this.linksClickCounter = Counter.builder("links.clicks")
+                .description("Total number of link clicks")
+                .register(meterRegistry);
+
+        this.linksCreateCounter = Counter.builder("shortener.links.created")
+                .description("Total number of links created")
+                .register(meterRegistry);
     }
 
     public LinkResponse createLink(CreateLinkRequest request) {
@@ -49,6 +62,9 @@ public class LinkService {
         response.setShortUrl(baseUrl + "/r/" + link.getShortCode());
         response.setShortCode(link.getShortCode());
         response.setExpiresAt(link.getExpiresAt());
+
+        linksCreateCounter.increment();
+
         return response;
     }
 
@@ -77,6 +93,8 @@ public class LinkService {
                         userAgent,
                         correlationId)
         );
+
+        linksClickCounter.increment();
     }
 
     public LinkInfoResponse getLinkInfo(String shortCode) {

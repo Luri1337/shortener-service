@@ -1,0 +1,13 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'shortener-service'
+    static_configs:
+      - targets: ['app:8080']
+    metrics_path: '/actuator/prometheus'
+
+  - job_name: 'analytics-service'
+    static_configs:
+      - targets: ['analytics:8081']
+    metrics_path: '/actuator/prometheus'
