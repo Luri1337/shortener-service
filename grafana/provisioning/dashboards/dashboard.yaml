@@ -1,0 +1,7 @@
+apiVersion: 1
+providers:
+  - name: shortener-dashboards
+    folder: Shortener
+    type: file
+    options:
+      path: /var/lib/grafana/dashboards
