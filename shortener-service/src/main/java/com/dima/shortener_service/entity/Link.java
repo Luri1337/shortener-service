@@ -13,9 +13,10 @@ import java.time.Instant;
 @AllArgsConstructor
 @Builder
 
+@EntityListeners(AuditingEntityListener.class)
+
 @Entity
 @Table(name = "links")
-@EntityListeners(AuditingEntityListener.class)
 public class Link {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "link_seq")

@@ -1,0 +1,1 @@
+ALTER TABLE click_events ADD CONSTRAINT uk_correlation_id UNIQUE (correlation_id);

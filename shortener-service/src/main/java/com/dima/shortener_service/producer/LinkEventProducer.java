@@ -12,7 +12,9 @@ public class LinkEventProducer {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void produceLinkEvent(LinkClickedEvent linkClickedEvent) {
-        kafkaTemplate.send("link-clicks", linkClickedEvent);
+    public void produceLinkEvent(LinkClickedEvent linkClickedEvent) throws Exception {
+        kafkaTemplate
+                .send("link-clicks", linkClickedEvent)
+                .get();
     }
 }

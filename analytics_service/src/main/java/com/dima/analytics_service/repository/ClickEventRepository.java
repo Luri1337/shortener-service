@@ -14,4 +14,6 @@ public interface ClickEventRepository extends JpaRepository<ClickEvent, Long> {
 
     @Query("SELECT COUNT(c) FROM ClickEvent c WHERE c.shortCode = :shortCode")
     Long countByShortCode(String shortCode);
+
+    boolean existsByCorrelationId(String correlationId);
 }

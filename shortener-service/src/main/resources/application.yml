@@ -28,6 +28,7 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
         spring.json.add.type.headers: false
+      acks: all
 
   analytics:
     service-url: ${ANALYTICS_SERVICE_URL:http://localhost:8081}

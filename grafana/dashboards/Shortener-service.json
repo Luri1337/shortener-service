@@ -263,7 +263,7 @@
         "kind": "Panel",
         "spec": {
           "id": 4,
-          "title": "outbox.pending.count",
+          "title": "outbox.processing.errors",
           "description": "",
           "links": [],
           "data": {
@@ -282,7 +282,7 @@
                       },
                       "spec": {
                         "editorMode": "code",
-                        "expr": "outbox_pending_count",
+                        "expr": "outbox_processing_errors",
                         "legendFormat": "__auto",
                         "range": true
                       }

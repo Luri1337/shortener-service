@@ -5,6 +5,7 @@ import com.dima.analytics_service.dto.LinkClickedEvent;
 import com.dima.analytics_service.entity.ClickEvent;
 import com.dima.analytics_service.repository.ClickEventRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -20,8 +21,12 @@ public class AnalyticsService {
 
 
     public void processClickEvent(LinkClickedEvent clickedEvent) {
+        if (clickEventRepository.existsByCorrelationId(clickedEvent.getCorrelationId())) {
+            log.info("Click event with correlationId {} already processed. Skipping.", clickedEvent.getCorrelationId());
+            return;
+        }
+
         log.info("Processing click event for short code: {}", clickedEvent.getShortCode());
-        log.info("Click event saved for shortCode: {}", clickedEvent.getShortCode());
 
         ClickEvent clickEvent = ClickEvent.builder()
                 .shortCode(clickedEvent.getShortCode())
@@ -31,7 +36,13 @@ public class AnalyticsService {
                 .correlationId(clickedEvent.getCorrelationId())
                 .build();
 
-        clickEventRepository.save(clickEvent);
+        try {
+            clickEventRepository.save(clickEvent);
+            log.info("Click event saved for shortCode: {}", clickedEvent.getShortCode());
+        } catch (DataIntegrityViolationException e) {
+            log.error("Duplicate event ignored for correlationId: {}", clickedEvent.getCorrelationId());
+        }
+
     }
 
     public AnalyticsResponse getAnalytics(String shortCode) {
