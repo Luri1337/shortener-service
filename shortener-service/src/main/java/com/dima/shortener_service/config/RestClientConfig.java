@@ -9,7 +9,7 @@ import org.springframework.web.client.RestClient;
 import java.time.Duration;
 
 @Configuration
-public class WebClient {
+public class RestClientConfig {
     @Value("${analytics.service.url}")
     private String analyticsServiceUrl;
 
