@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -355,70 +355,70 @@
 
   <header>
     <p class="logo">// url shortener</p>
-    <h1>Длинные ссылки —<br><span>короткий путь</span></h1>
-    <p class="subtitle">Сокращай, управляй, смотри статистику</p>
+    <h1>Shorten.<br><span>Share. Track.</span></h1>
+    <p class="subtitle">Create, manage and track your short links</p>
   </header>
 
   <div class="tabs">
-    <button class="tab active" onclick="switchTab('create')">Создать</button>
-    <button class="tab" onclick="switchTab('manage')">Управление</button>
-    <button class="tab" onclick="switchTab('history')">История</button>
+    <button class="tab active" onclick="switchTab('create')">Create</button>
+    <button class="tab" onclick="switchTab('manage')">Manage</button>
+    <button class="tab" onclick="switchTab('history')">History</button>
   </div>
 
   <!-- ══ TAB: CREATE ══ -->
   <div class="card active" id="tab-create">
-    <p class="section-title">Новая короткая ссылка</p>
+    <p class="section-title">New short link</p>
 
     <div class="field">
-      <label for="url-input">Длинная ссылка</label>
+      <label for="url-input">Long URL</label>
       <input id="url-input" type="url" placeholder="https://example.com/very/long/url/..." />
     </div>
 
     <div class="field">
-      <label for="days-input">Срок действия (дней)</label>
-      <input id="days-input" type="number" placeholder="Необязательно — оставь пустым для бессрочной" min="1" max="365" />
+      <label for="days-input">Expiry (days)</label>
+      <input id="days-input" type="number" placeholder="Optional — leave empty for permanent" min="1" max="365" />
     </div>
 
     <div id="create-msg" class="msg"></div>
-    <button class="btn" id="create-btn" onclick="createLink()">Сократить ссылку →</button>
+    <button class="btn" id="create-btn" onclick="createLink()">Shorten URL →</button>
 
     <div id="create-result" class="result-box">
-      <p class="section-title">Готово</p>
+      <p class="section-title">Done</p>
 
       <div class="result-url-row">
         <a id="result-short-url" href="#" target="_blank"></a>
-        <button class="btn btn-ghost btn-sm" onclick="copyShortUrl()">Копировать</button>
+        <button class="btn btn-ghost btn-sm" onclick="copyShortUrl()">Copy</button>
       </div>
 
       <div class="stats-grid">
         <div class="stat-cell">
           <div class="stat-val" id="result-clicks">0</div>
-          <div class="stat-key">Переходов</div>
+          <div class="stat-key">Clicks</div>
         </div>
         <div class="stat-cell">
           <div class="stat-val" id="result-expires">∞</div>
-          <div class="stat-key">Истекает</div>
+          <div class="stat-key">Expires</div>
         </div>
       </div>
 
       <div class="row">
-        <button class="btn btn-ghost btn-sm" onclick="goToManage()">Управление →</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteFromCreate()">Удалить</button>
+        <button class="btn btn-ghost btn-sm" onclick="goToManage()">Manage →</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteFromCreate()">Delete</button>
       </div>
     </div>
   </div>
 
   <!-- ══ TAB: MANAGE ══ -->
   <div class="card" id="tab-manage">
-    <p class="section-title">Управление ссылкой</p>
+    <p class="section-title">Link management</p>
 
     <div class="row">
       <div class="field">
         <label for="manage-code">Short Code</label>
-        <input id="manage-code" type="text" placeholder="например: abc12345" maxlength="8" />
+        <input id="manage-code" type="text" placeholder="e.g. abc12345" maxlength="8" />
       </div>
       <div style="display:flex; align-items:flex-end;">
-        <button class="btn btn-sm" style="width:auto; white-space:nowrap;" onclick="loadLinkInfo()">Найти</button>
+        <button class="btn btn-sm" style="width:auto; white-space:nowrap;" onclick="loadLinkInfo()">Find</button>
       </div>
     </div>
 
@@ -426,7 +426,7 @@
 
     <div id="manage-info" style="display:none; flex-direction:column; gap:14px;">
       <hr />
-      <p class="section-title">Информация о ссылке</p>
+      <p class="section-title">Link info</p>
 
       <div class="info-table">
         <div class="info-row">
@@ -434,46 +434,46 @@
           <span class="info-val accent" id="info-code">—</span>
         </div>
         <div class="info-row">
-          <span class="info-key">Короткая ссылка</span>
+          <span class="info-key">Short URL</span>
           <span class="info-val" id="info-short">—</span>
         </div>
         <div class="info-row">
-          <span class="info-key">Оригинальная</span>
+          <span class="info-key">Original URL</span>
           <span class="info-val" id="info-original">—</span>
         </div>
         <div class="info-row">
-          <span class="info-key">Создана</span>
+          <span class="info-key">Created</span>
           <span class="info-val" id="info-created">—</span>
         </div>
         <div class="info-row">
-          <span class="info-key">Истекает</span>
+          <span class="info-key">Expires</span>
           <span class="info-val" id="info-expires">—</span>
         </div>
         <div class="info-row">
-          <span class="info-key">Статус</span>
+          <span class="info-key">Status</span>
           <span class="info-val" id="info-status">—</span>
         </div>
       </div>
 
       <hr />
-      <p class="section-title">Аналитика</p>
+      <p class="section-title">Analytics</p>
 
       <div class="stats-grid">
         <div class="stat-cell">
           <div class="stat-val" id="info-clicks">—</div>
-          <div class="stat-key">Всего переходов</div>
+          <div class="stat-key">Total clicks</div>
         </div>
         <div class="stat-cell">
           <div class="stat-val" id="info-last-clicked">—</div>
-          <div class="stat-key">Последний клик</div>
+          <div class="stat-key">Last click</div>
         </div>
       </div>
 
       <hr />
 
       <div class="row">
-        <button class="btn btn-ghost" onclick="refreshStats()">Обновить статистику</button>
-        <button class="btn btn-danger" onclick="deleteLink()">Удалить ссылку</button>
+        <button class="btn btn-ghost" onclick="refreshStats()">Refresh stats</button>
+        <button class="btn btn-danger" onclick="deleteLink()">Delete ссылку</button>
       </div>
 
       <div id="delete-msg" class="msg"></div>
@@ -482,12 +482,12 @@
 
   <!-- ══ TAB: HISTORY ══ -->
   <div class="card" id="tab-history">
-    <p class="section-title">Созданные в этой сессии</p>
-    <p style="font-size:12px; color:var(--muted);">История хранится только пока страница открыта. При перезагрузке очищается.</p>
+    <p class="section-title">Created this session</p>
+    <p style="font-size:12px; color:var(--muted);">History is stored only while the page is open. Cleared on reload.</p>
     <div id="history-list" class="history-list">
-      <p class="history-empty">Пока нет созданных ссылок</p>
+      <p class="history-empty">No links created yet</p>
     </div>
-    <button class="btn btn-ghost" id="clear-history-btn" style="display:none;" onclick="clearHistory()">Очистить историю</button>
+    <button class="btn btn-ghost" id="clear-history-btn" style="display:none;" onclick="clearHistory()">Clear history</button>
   </div>
 
 </div>
@@ -514,10 +514,10 @@
     clearMsg(msg);
     document.getElementById('create-result').classList.remove('visible');
 
-    if (!url) { showMsg(msg, 'error', 'Введите ссылку'); return; }
+    if (!url) { showMsg(msg, 'error', 'Enter a URL'); return; }
 
     btn.disabled = true;
-    btn.textContent = 'Создаём...';
+    btn.textContent = 'Creating...';
 
     try {
       const body = { originalUrl: url };
@@ -553,13 +553,13 @@
       document.getElementById('create-result').classList.add('visible');
 
       addToHistory({ shortCode: data.shortCode, originalUrl: url, shortUrl, expiresAt: data.expiresAt });
-      showMsg(msg, 'success', 'Ссылка создана успешно');
+      showMsg(msg, 'success', 'Link created successfully');
 
     } catch (e) {
-      showMsg(msg, 'error', 'Не удалось подключиться к серверу');
+      showMsg(msg, 'error', 'Could not connect to server');
     } finally {
       btn.disabled = false;
-      btn.textContent = 'Сократить ссылку →';
+      btn.textContent = 'Shorten URL →';
     }
   }
 
@@ -567,8 +567,8 @@
     const url = document.getElementById('result-short-url').textContent;
     navigator.clipboard.writeText(url).then(() => {
       const btn = document.querySelector('.result-url-row .btn-ghost');
-      btn.textContent = 'Скопировано ✓';
-      setTimeout(() => btn.textContent = 'Копировать', 1600);
+      btn.textContent = 'Copied ✓';
+      setTimeout(() => btn.textContent = 'Copy', 1600);
     });
   }
 
@@ -594,12 +594,12 @@
     clearMsg(msg);
     info.style.display = 'none';
 
-    if (!code) { showMsg(msg, 'error', 'Введите short code'); return; }
+    if (!code) { showMsg(msg, 'error', 'Enter short code'); return; }
 
     try {
       const resInfo = await fetch(`${BASE}/api/links/${code}`);
       if (!resInfo.ok) {
-        showMsg(msg, 'error', resInfo.status === 404 ? 'Ссылка не найдена' : `Ошибка ${resInfo.status}`);
+        showMsg(msg, 'error', resInfo.status === 404 ? 'Link not found' : `Ошибка ${resInfo.status}`);
         return;
       }
       const d = await resInfo.json();
@@ -610,22 +610,22 @@
       document.getElementById('info-created').textContent  = d.createdAt
               ? new Date(d.createdAt).toLocaleString('ru-RU') : '—';
       document.getElementById('info-expires').textContent  = d.expiresAt
-              ? new Date(d.expiresAt).toLocaleString('ru-RU') : 'Бессрочная';
+              ? new Date(d.expiresAt).toLocaleString('ru-RU') : 'Permanent';
 
       const statusEl = document.getElementById('info-status');
       const isExpired = d.expiresAt && new Date(d.expiresAt) < new Date();
       statusEl.innerHTML = isExpired
-              ? '<span class="badge badge-expired">Истекла</span>'
-              : '<span class="badge badge-ok">Активна</span>';
+              ? '<span class="badge badge-expired">Expired</span>'
+              : '<span class="badge badge-ok">Active</span>';
 
-      // Аналитика из analytics-service
+      // Analytics из analytics-service
       await loadStats(code);
 
       info.style.display = 'flex';
       clearMsg(document.getElementById('delete-msg'));
 
     } catch (e) {
-      showMsg(msg, 'error', 'Не удалось подключиться к серверу');
+      showMsg(msg, 'error', 'Could not connect to server');
     }
   }
 
@@ -636,8 +636,8 @@
       if (!res.ok) return;
       const d = await res.json();
       document.getElementById('info-clicks').textContent = d.totalClicks ?? 0;
-      document.getElementById('info-last-clicked').textContent = d.lastClickedAt
-              ? new Date(d.lastClickedAt).toLocaleString('ru-RU')
+      document.getElementById('info-last-clicked').textContent = d.lastClickAt
+              ? new Date(d.lastClickAt).toLocaleString('ru-RU')
               : '—';
     } catch (_) {}
   }
@@ -646,7 +646,7 @@
     const code = document.getElementById('manage-code').value.trim();
     if (!code) return;
     await loadStats(code);
-    showMsg(document.getElementById('manage-msg'), 'success', 'Статистика обновлена');
+    showMsg(document.getElementById('manage-msg'), 'success', 'Stats updated');
     setTimeout(() => clearMsg(document.getElementById('manage-msg')), 2000);
   }
 
@@ -664,16 +664,16 @@
     try {
       const res = await fetch(`${BASE}/api/links/${code}`, { method: 'DELETE' });
       if (res.ok || res.status === 204) {
-        showMsg(msgEl, 'success', 'Ссылка удалена');
+        showMsg(msgEl, 'success', 'Link deleted');
         removeFromHistory(code);
         return true;
       } else if (res.status === 404) {
-        showMsg(msgEl, 'error', 'Ссылка не найдена');
+        showMsg(msgEl, 'error', 'Link not found');
       } else {
         showMsg(msgEl, 'error', `Ошибка ${res.status}`);
       }
     } catch (e) {
-      showMsg(msgEl, 'error', 'Не удалось подключиться к серверу');
+      showMsg(msgEl, 'error', 'Could not connect to server');
     }
     return false;
   }
@@ -699,7 +699,7 @@
     const clearBtn = document.getElementById('clear-history-btn');
 
     if (history.length === 0) {
-      list.innerHTML = '<p class="history-empty">Пока нет созданных ссылок</p>';
+      list.innerHTML = '<p class="history-empty">No links created yet</p>';
       clearBtn.style.display = 'none';
       return;
     }
