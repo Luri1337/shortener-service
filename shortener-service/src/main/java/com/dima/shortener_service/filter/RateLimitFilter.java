@@ -23,6 +23,12 @@ public class RateLimitFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
+        String path = httpRequest.getRequestURI();
+        if (path.startsWith("/actuator")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         String ip = httpRequest.getRemoteAddr();
 
         try {
