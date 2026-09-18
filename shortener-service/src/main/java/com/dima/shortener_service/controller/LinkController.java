@@ -39,6 +39,7 @@ public class LinkController {
             @PathVariable String shortCode,
             @RequestHeader(value = "User-Agent", defaultValue = "unknown") String userAgent) {
 
+        linkService.checkLinkExpiration(shortCode);
         String originalUrl = linkService.getOriginalUrl(shortCode);
 
         log.info("Redirecting shortcode: {} to: {}", shortCode, originalUrl);

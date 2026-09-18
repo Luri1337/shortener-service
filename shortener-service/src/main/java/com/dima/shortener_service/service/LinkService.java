@@ -81,12 +81,18 @@ public class LinkService {
                 .findByShortCode(shortCode)
                 .orElseThrow(() -> new LinkNotFoundException("Link not found"));
 
+        return link.getOriginalUrl();
+    }
+
+    public void checkLinkExpiration(String shortCode) {
+        Link link = linkRepository
+                .findByShortCode(shortCode)
+                .orElseThrow(() -> new LinkNotFoundException("Link not found"));
+
         if (link.isExpired()) {
             log.warn("Link expired with shortcode: {}", shortCode);
             throw new LinkExpiredException("Link has expired");
         }
-
-        return link.getOriginalUrl();
     }
 
     @Transactional
@@ -149,8 +155,14 @@ public class LinkService {
     @Transactional
     @CacheEvict(value = "links", key = "#shortCode")
     public void deleteLink(String shortCode) {
+        Link link = linkRepository
+                .findByShortCode(shortCode)
+                .orElseThrow(
+                        () -> new LinkNotFoundException("Link not found")
+                );
+
         log.info("Deleting link with short code: {}", shortCode);
-        linkRepository.deleteByShortCode(shortCode);
+        linkRepository.delete(link);
     }
 
     private String generateShortCode() {

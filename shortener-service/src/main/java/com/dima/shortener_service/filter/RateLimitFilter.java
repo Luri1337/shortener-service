@@ -24,12 +24,18 @@ public class RateLimitFilter implements Filter {
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
         String path = httpRequest.getRequestURI();
-        if (path.startsWith("/actuator")) {
+        if (path.startsWith("/actuator")
+                || !path.equals("/api/links")
+                || !httpRequest.getMethod().equals("POST")) {
             chain.doFilter(request, response);
             return;
         }
 
-        String ip = httpRequest.getRemoteAddr();
+        String ip = httpRequest.getHeader("X-Real-IP");
+
+        if (ip == null || ip.isEmpty()) {
+            ip = httpRequest.getRemoteAddr();
+        }
 
         try {
             if (rateLimitService.isRateLimited(ip)) {
@@ -39,7 +45,7 @@ public class RateLimitFilter implements Filter {
                 return;
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             log.warn("Redis is unavailable, request rate limiting is disabled: {}", e.getMessage());
         }
 
