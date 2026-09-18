@@ -34,7 +34,7 @@ public class LinkController {
                 .body(linkService.createLink(request));
     }
 
-    @GetMapping("/r/{shortCode}")
+    @GetMapping("/{shortCode}")
     public ResponseEntity<Void> redirectToOriginalUrl(
             @PathVariable String shortCode,
             @RequestHeader(value = "User-Agent", defaultValue = "unknown") String userAgent) {

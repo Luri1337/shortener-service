@@ -66,7 +66,7 @@ public class LinkService {
         linkRepository.save(link);
 
         LinkResponse response = new LinkResponse();
-        response.setShortUrl(baseUrl + "/r/" + link.getShortCode());
+        response.setShortUrl(buildShortUrl(link.getShortCode()));
         response.setShortCode(link.getShortCode());
         response.setExpiresAt(link.getExpiresAt());
 
@@ -141,7 +141,7 @@ public class LinkService {
         response.setClickCount(link.getClicks());
         response.setCreatedAt(link.getCreatedAt());
         response.setExpiresAt(link.getExpiresAt());
-        response.setShortUrl(baseUrl + "/" + link.getShortCode());
+        response.setShortUrl(buildShortUrl(link.getShortCode()));
 
         return response;
     }
@@ -163,5 +163,9 @@ public class LinkService {
 
     private Instant countDownExpiration(Integer expiresAt) {
         return expiresAt != null ? Instant.now().plus(expiresAt, ChronoUnit.DAYS) : null;
+    }
+
+    private String buildShortUrl(String shortCode) {
+        return baseUrl + "/" + shortCode;
     }
 }
