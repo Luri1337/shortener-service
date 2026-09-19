@@ -105,10 +105,7 @@ public class LinkService {
     }
 
     private void incrementClicks(String shortCode) {
-        Link link = linkRepository.findByShortCode(shortCode)
-                .orElseThrow(() -> new LinkNotFoundException("Link not found"));
-        link.setClicks(link.getClicks() + 1);
-        linkRepository.save(link);
+        linkRepository.incrementClicks(shortCode);
     }
 
     private void saveToOutbox(String shortCode, String originalUrl, String userAgent) {
