@@ -5,11 +5,14 @@ import com.dima.shortener_service.entity.OutboxEvent;
 import com.dima.shortener_service.repository.OutboxEventRepository;
 
 import org.slf4j.MDC;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.Instant;
+import java.util.List;
 
 @Service
 public class EventService {
@@ -34,6 +37,7 @@ public class EventService {
         outboxEventRepository.save(event);
     }
 
+    @Transactional
     public void saveToOutbox(String shortCode, String originalUrl, String userAgent) {
         LinkClickedEvent clickedEvent = new LinkClickedEvent(
                 shortCode,
@@ -55,5 +59,17 @@ public class EventService {
         } catch (Exception e) {
             throw new RuntimeException("Failed to serialize event", e);
         }
+    }
+
+    public List<OutboxEvent> getPendingEvents() {
+        return outboxEventRepository
+                .findByStatus(
+                        OutboxEvent.OutboxStatus.PENDING,
+                        PageRequest.of(
+                                0,
+                                100,
+                                Sort.by("createdAt").ascending()
+                        )
+                );
     }
 }

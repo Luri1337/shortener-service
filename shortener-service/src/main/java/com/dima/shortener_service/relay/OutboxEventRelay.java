@@ -9,8 +9,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
@@ -20,19 +18,16 @@ import java.util.List;
 @Slf4j
 @Component
 public class OutboxEventRelay {
-    private final OutboxEventRepository outboxEventRepository;
     private final EventService eventService;
     private final LinkEventProducer linkEventProducer;
     private final ObjectMapper objectMapper;
 
     private final Counter outboxProcessingErrors;
 
-    public OutboxEventRelay(OutboxEventRepository outboxEventRepository,
-                            EventService eventService,
+    public OutboxEventRelay(EventService eventService,
                             LinkEventProducer linkEventProducer,
                             ObjectMapper objectMapper,
                             MeterRegistry meterRegistry) {
-        this.outboxEventRepository = outboxEventRepository;
         this.eventService = eventService;
         this.linkEventProducer = linkEventProducer;
         this.objectMapper = objectMapper;
@@ -43,15 +38,7 @@ public class OutboxEventRelay {
 
     @Scheduled(fixedDelay = 5000)
     public void processOutboxEvents() {
-        List<OutboxEvent> events = outboxEventRepository
-                .findByStatus(
-                        OutboxEvent.OutboxStatus.PENDING,
-                        PageRequest.of(
-                                0,
-                                100,
-                                Sort.by("createdAt").ascending()
-                        )
-                );
+        List<OutboxEvent> events = eventService.getPendingEvents();
 
         for (OutboxEvent event : events) {
             try {

@@ -47,7 +47,6 @@ class OutboxEventRelayTest {
     @BeforeEach
     void setUp() {
         outboxRelay = new OutboxEventRelay(
-                outboxEventRepository,
                 eventService,
                 linkEventProducer,
                 objectMapper,
