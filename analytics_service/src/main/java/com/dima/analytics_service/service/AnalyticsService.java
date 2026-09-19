@@ -21,7 +21,7 @@ public class AnalyticsService {
 
 
     public void processClickEvent(LinkClickedEvent clickedEvent) {
-        if (clickEventRepository.existsByCorrelationId(clickedEvent.getCorrelationId())) {
+        if (clickEventRepository.existsByEventId(clickedEvent.getEventId())) {
             log.info("Click event with correlationId {} already processed. Skipping.", clickedEvent.getCorrelationId());
             return;
         }
@@ -33,14 +33,14 @@ public class AnalyticsService {
                 .originalUrl(clickedEvent.getOriginalUrl())
                 .clickedAt(Instant.parse(clickedEvent.getClickedAt()))
                 .userAgent(clickedEvent.getUserAgent())
-                .correlationId(clickedEvent.getCorrelationId())
+                .eventId(clickedEvent.getEventId())
                 .build();
 
         try {
             clickEventRepository.save(clickEvent);
             log.info("Click event saved for shortCode: {}", clickedEvent.getShortCode());
         } catch (DataIntegrityViolationException e) {
-            log.error("Duplicate event ignored for correlationId: {}", clickedEvent.getCorrelationId());
+            log.error("Duplicate event ignored for eventId: {}", clickedEvent.getEventId());
         }
 
     }

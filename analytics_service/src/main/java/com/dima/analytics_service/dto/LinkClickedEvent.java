@@ -12,4 +12,5 @@ public class LinkClickedEvent {
     private String clickedAt;
     private String userAgent;
     private String correlationId;
+    private String eventId;
 }

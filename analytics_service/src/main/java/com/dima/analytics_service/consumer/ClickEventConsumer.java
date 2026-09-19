@@ -24,8 +24,8 @@ public class ClickEventConsumer {
     )
     public void consume(LinkClickedEvent clickedEvent) {
         try {
-            log.info("Received click event for short code: {}", clickedEvent.getShortCode());
             MDC.put("correlationId",  clickedEvent.getCorrelationId());
+            log.info("Received click event for short code: {}", clickedEvent.getShortCode());
             analyticsService.processClickEvent(clickedEvent);
         }finally {
             MDC.clear();

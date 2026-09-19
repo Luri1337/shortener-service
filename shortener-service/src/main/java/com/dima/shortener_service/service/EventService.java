@@ -13,6 +13,7 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class EventService {
@@ -44,7 +45,8 @@ public class EventService {
                 originalUrl,
                 Instant.now().toString(),
                 userAgent,
-                MDC.get("correlationId")
+                MDC.get("correlationId"),
+                UUID.randomUUID().toString()
         );
         try {
             String payload = objectMapper.writeValueAsString(clickedEvent);

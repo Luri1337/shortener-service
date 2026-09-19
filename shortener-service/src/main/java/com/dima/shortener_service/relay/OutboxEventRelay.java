@@ -3,7 +3,6 @@ package com.dima.shortener_service.relay;
 import com.dima.shortener_service.dto.LinkClickedEvent;
 import com.dima.shortener_service.entity.OutboxEvent;
 import com.dima.shortener_service.producer.LinkEventProducer;
-import com.dima.shortener_service.repository.OutboxEventRepository;
 import com.dima.shortener_service.service.EventService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.micrometer.core.instrument.Counter;
