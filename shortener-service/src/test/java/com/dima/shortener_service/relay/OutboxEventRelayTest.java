@@ -1,5 +1,6 @@
 package com.dima.shortener_service.relay;
 
+import com.dima.shortener_service.service.EventService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,12 +39,16 @@ class OutboxEventRelayTest {
     @Mock
     private ObjectMapper objectMapper;
 
+    @Mock
+    private EventService eventService;
+
     private OutboxEventRelay outboxRelay;
 
     @BeforeEach
     void setUp() {
         outboxRelay = new OutboxEventRelay(
                 outboxEventRepository,
+                eventService,
                 linkEventProducer,
                 objectMapper,
                 new SimpleMeterRegistry()
