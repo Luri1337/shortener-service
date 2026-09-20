@@ -13,11 +13,13 @@ import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-
 
 @ExtendWith(MockitoExtension.class)
 public class RateLimitServiceTest {
+
     @Mock
     private RedisTemplate<String, String> redisTemplate;
 
@@ -35,8 +37,10 @@ public class RateLimitServiceTest {
     @Test
     void firstRequestShouldNotBeRateLimited() {
         String ipAddress = "192.168.0.0";
+        String key = "rate_limit:" + ipAddress;
 
-        when(valueOperations.increment("rate_limit:" + ipAddress)).thenReturn(1L);
+        when(valueOperations.setIfAbsent(eq(key), eq("0"), any(Duration.class))).thenReturn(true);
+        when(valueOperations.increment(key)).thenReturn(1L);
 
         boolean isRateLimited = rateLimitService.isRateLimited(ipAddress);
 
@@ -46,8 +50,10 @@ public class RateLimitServiceTest {
     @Test
     void eleventhRequestShouldBeRateLimited() {
         String ipAddress = "192.168.0.0";
+        String key = "rate_limit:" + ipAddress;
 
-        when(valueOperations.increment("rate_limit:" + ipAddress)).thenReturn(11L);
+        when(valueOperations.setIfAbsent(eq(key), eq("0"), any(Duration.class))).thenReturn(false);
+        when(valueOperations.increment(key)).thenReturn(11L);
 
         boolean isRateLimited = rateLimitService.isRateLimited(ipAddress);
 
@@ -57,23 +63,26 @@ public class RateLimitServiceTest {
     @Test
     void firstRequestShouldSetExpiration() {
         String ipAddress = "192.168.0.0";
+        String key = "rate_limit:" + ipAddress;
 
-        when(valueOperations.increment("rate_limit:" + ipAddress)).thenReturn(1L);
+        when(valueOperations.setIfAbsent(eq(key), eq("0"), any(Duration.class))).thenReturn(true);
+        when(valueOperations.increment(key)).thenReturn(1L);
 
         rateLimitService.isRateLimited(ipAddress);
 
-        verify(redisTemplate, times(1)).expire("rate_limit:" + ipAddress, Duration.ofSeconds(60));
+        verify(valueOperations, times(1)).setIfAbsent(eq(key), eq("0"), any(Duration.class));
     }
 
     @Test
-    void subsequentRequestsShouldNotSetExpiration() {
+    void subsequentRequestsShouldNotResetExpiration() {
         String ipAddress = "192.168.0.0";
+        String key = "rate_limit:" + ipAddress;
 
-        when(valueOperations.increment("rate_limit:" + ipAddress)).thenReturn(2L);
+        when(valueOperations.setIfAbsent(eq(key), eq("0"), any(Duration.class))).thenReturn(false);
+        when(valueOperations.increment(key)).thenReturn(2L);
 
         rateLimitService.isRateLimited(ipAddress);
 
-        verify(redisTemplate, times(0)).expire("rate_limit:" + ipAddress, Duration.ofSeconds(60));
+        verify(valueOperations, times(1)).setIfAbsent(eq(key), eq("0"), any(Duration.class));
     }
-
 }

@@ -4,7 +4,6 @@ import com.dima.analytics_service.dto.AnalyticsResponse;
 import com.dima.analytics_service.service.AnalyticsService;
 import org.slf4j.MDC;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

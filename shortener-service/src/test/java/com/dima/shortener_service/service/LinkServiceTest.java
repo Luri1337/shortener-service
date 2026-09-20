@@ -6,10 +6,10 @@ import com.dima.shortener_service.dto.LinkResponse;
 import com.dima.shortener_service.entity.Link;
 import com.dima.shortener_service.exception.LinkNotFoundException;
 import com.dima.shortener_service.repository.LinkRepository;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -23,14 +23,18 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class LinkServiceTest {
+
     @Mock
     private LinkRepository linkRepository;
 
-    @InjectMocks
+    @Mock
+    private EventService eventService;
+
     private LinkService linkService;
 
     @BeforeEach
     void setUp() {
+        linkService = new LinkService(linkRepository, new SimpleMeterRegistry(), eventService);
         ReflectionTestUtils.setField(linkService, "baseUrl", "http://localhost:8080");
     }
 

@@ -26,11 +26,10 @@ import com.dima.shortener_service.client.AnalyticsClient;
 
 import java.time.Instant;
 
-
 @SpringBootTest
 @TestPropertySource(properties = {
         "app.base-url=http://localhost:8080",
-        "analytics.service.url=http://localhost:8081"
+        "analytics.service-url=http://localhost:8081"
 })
 class LinkServiceTransactionalTest {
 

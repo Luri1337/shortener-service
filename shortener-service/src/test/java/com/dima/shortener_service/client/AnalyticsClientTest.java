@@ -39,6 +39,7 @@ class AnalyticsClientTest {
         doReturn(requestHeadersSpec).when(requestHeadersUriSpec).uri(anyString(), any(Object.class));
         doReturn(responseSpec).when(requestHeadersSpec).retrieve();
         doReturn(expected).when(responseSpec).body(AnalyticsResponse.class);
+        doReturn(requestHeadersSpec).when(requestHeadersSpec).header(anyString(), any());
 
         AnalyticsResponse result = analyticsClient.getLinkAnalytics("abc12345");
 
@@ -52,6 +53,7 @@ class AnalyticsClientTest {
         doReturn(requestHeadersUriSpec).when(restClient).get();
         doReturn(requestHeadersSpec).when(requestHeadersUriSpec).uri(anyString(), any(Object.class));
         doReturn(responseSpec).when(requestHeadersSpec).retrieve();
+        doReturn(requestHeadersSpec).when(requestHeadersSpec).header(anyString(), any(String[].class));
         doThrow(new RuntimeException("Service unavailable")).when(responseSpec).body(AnalyticsResponse.class);
 
         AnalyticsResponse result = analyticsClient.getLinkAnalytics("abc12345");
