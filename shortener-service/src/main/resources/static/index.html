@@ -566,33 +566,37 @@
   function copyShortUrl() {
     const url = document.getElementById('result-short-url').textContent;
 
-    navigator.clipboard.writeText(url)
-            .then(() => {
-              showCopied();
-            })
-            .catch(() => {
-              const textarea = document.createElement('textarea');
-              textarea.value = url;
-              textarea.style.position = 'fixed';
-              textarea.style.opacity = '0';
-              document.body.appendChild(textarea);
-              textarea.focus();
-              textarea.select();
+    const textarea = document.createElement('textarea');
+    textarea.value = url;
+    textarea.style.position = 'fixed';
+    textarea.style.left = '-9999px';
 
-              try {
-                document.execCommand('copy');
-                showCopied();
-              } finally {
-                textarea.remove();
-              }
-            });
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+
+    try {
+      const success = document.execCommand('copy');
+
+      const btn = document.querySelector('.result-url-row .btn-ghost');
+
+      if (success) {
+        btn.textContent = 'Copied ✓';
+      } else {
+        btn.textContent = 'Copy failed';
+      }
+
+      setTimeout(() => {
+        btn.textContent = 'Copy';
+      }, 1600);
+
+    } catch (e) {
+      console.error('Copy failed:', e);
+    } finally {
+      document.body.removeChild(textarea);
+    }
   }
 
-  function showCopied() {
-    const btn = document.querySelector('.result-url-row .btn-ghost');
-    btn.textContent = 'Copied ✓';
-    setTimeout(() => btn.textContent = 'Copy', 1600);
-  }
   function goToManage() {
     if (!createdShortCode) return;
     document.getElementById('manage-code').value = createdShortCode;
