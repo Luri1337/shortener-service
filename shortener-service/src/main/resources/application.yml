@@ -8,7 +8,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
-    show-sql: true
+    show-sql: false
 
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
