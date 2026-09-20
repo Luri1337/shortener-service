@@ -32,6 +32,14 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.create(ex, HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()), ex.getMessage()));
     }
 
+    @ExceptionHandler(OutboxSerializationException.class)
+    public ResponseEntity<ErrorResponse> handleOutboxSerializationException(OutboxSerializationException ex){
+        log.error("Outbox serialization failed: {}", ex.getMessage(), ex);
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ErrorResponse.create(ex, HttpStatusCode.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()), "Internal server error"));
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationException(MethodArgumentNotValidException ex) {
         log.warn("Validation failed: {}", ex.getMessage());

@@ -2,8 +2,10 @@ package com.dima.shortener_service.service;
 
 import com.dima.shortener_service.dto.LinkClickedEvent;
 import com.dima.shortener_service.entity.OutboxEvent;
+import com.dima.shortener_service.exception.OutboxSerializationException;
 import com.dima.shortener_service.repository.OutboxEventRepository;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.MDC;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -58,8 +60,9 @@ public class EventService {
                     .status(OutboxEvent.OutboxStatus.PENDING)
                     .build();
             outboxEventRepository.save(event);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to serialize event", e);
+        }
+        catch (Exception e) {
+            throw new OutboxSerializationException("Failed to save outbox event", e);
         }
     }
 
