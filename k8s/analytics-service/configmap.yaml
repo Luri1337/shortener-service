@@ -3,5 +3,5 @@ kind: ConfigMap
 metadata:
   name: analytics-config
 data:
-  KAFKA_BOOTSTRAP_SERVERS: "host.docker.internal:29092"
-  SPRING_DATASOURCE_URL: "jdbc:postgresql://host.docker.internal:5433/analytics_db"
+  KAFKA_BOOTSTRAP_SERVERS: "kafka-broker:9092"
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://analytics-db:5432/analytics_db"

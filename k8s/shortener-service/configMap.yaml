@@ -3,8 +3,8 @@ kind: ConfigMap
 metadata:
   name: shortener-config
 data:
-  APP_BASE_URL: "http://localhost:30080"
-  KAFKA_BOOTSTRAP_SERVERS: "host.docker.internal:29092"
-  REDIS_HOST: "host.docker.internal"
-  SPRING_DATASOURCE_URL: "jdbc:postgresql://host.docker.internal:5432/shortener_db"
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://db:5432/shortener_db"
+  REDIS_HOST: "redis"
+  KAFKA_BOOTSTRAP_SERVERS: "kafka-broker:9092"
   ANALYTICS_SERVICE_URL: "http://analytics-service:8081"
+  APP_BASE_URL: "http://localhost:30080"

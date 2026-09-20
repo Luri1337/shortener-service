@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: analytics-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: analytics-db
+  template:
+    metadata:
+      labels:
+        app: analytics-db
+    spec:
+      containers:
+        - name: analytics-db
+          image: postgres:16
+          imagePullPolicy: Never
+          env:
+            - name: POSTGRES_DB
+              value: analytics_db
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: analytics-secrets
+                  key: SPRING_DATASOURCE_USERNAME
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: analytics-secrets
+                  key: SPRING_DATASOURCE_PASSWORD
+          ports:
+            - containerPort: 5432
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: analytics-db
+spec:
+  type: ClusterIP
+  selector:
+    app: analytics-db
+  ports:
+    - port: 5432
+      targetPort: 5432
