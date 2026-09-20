@@ -565,13 +565,34 @@
 
   function copyShortUrl() {
     const url = document.getElementById('result-short-url').textContent;
-    navigator.clipboard.writeText(url).then(() => {
-      const btn = document.querySelector('.result-url-row .btn-ghost');
-      btn.textContent = 'Copied ✓';
-      setTimeout(() => btn.textContent = 'Copy', 1600);
-    });
+
+    navigator.clipboard.writeText(url)
+            .then(() => {
+              showCopied();
+            })
+            .catch(() => {
+              const textarea = document.createElement('textarea');
+              textarea.value = url;
+              textarea.style.position = 'fixed';
+              textarea.style.opacity = '0';
+              document.body.appendChild(textarea);
+              textarea.focus();
+              textarea.select();
+
+              try {
+                document.execCommand('copy');
+                showCopied();
+              } finally {
+                textarea.remove();
+              }
+            });
   }
 
+  function showCopied() {
+    const btn = document.querySelector('.result-url-row .btn-ghost');
+    btn.textContent = 'Copied ✓';
+    setTimeout(() => btn.textContent = 'Copy', 1600);
+  }
   function goToManage() {
     if (!createdShortCode) return;
     document.getElementById('manage-code').value = createdShortCode;
