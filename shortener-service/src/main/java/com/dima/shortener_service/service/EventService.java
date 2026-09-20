@@ -5,7 +5,6 @@ import com.dima.shortener_service.entity.OutboxEvent;
 import com.dima.shortener_service.exception.OutboxSerializationException;
 import com.dima.shortener_service.repository.OutboxEventRepository;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.MDC;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
