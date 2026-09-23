@@ -14,7 +14,7 @@ import org.springframework.web.client.RestClient;
 
 @Configuration
 public class RestClientConfig {
-    @Value("${analytics.service-url}")
+    @Value("${spring.analytics.service-url}")
     private String analyticsServiceUrl;
 
     @Bean
