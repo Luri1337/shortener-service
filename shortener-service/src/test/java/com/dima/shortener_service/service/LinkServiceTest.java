@@ -30,11 +30,14 @@ public class LinkServiceTest {
     @Mock
     private EventService eventService;
 
+    @Mock
+    private LinkCacheService linkCacheService;
+
     private LinkService linkService;
 
     @BeforeEach
     void setUp() {
-        linkService = new LinkService(linkRepository, new SimpleMeterRegistry(), eventService);
+        linkService = new LinkService(linkRepository, new SimpleMeterRegistry(), eventService, linkCacheService);
         ReflectionTestUtils.setField(linkService, "baseUrl", "http://localhost:8080");
     }
 

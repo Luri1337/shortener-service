@@ -5,8 +5,10 @@ import com.dima.shortener_service.dto.AnalyticsResponse;
 import com.dima.shortener_service.dto.CreateLinkRequest;
 import com.dima.shortener_service.dto.LinkInfoResponse;
 import com.dima.shortener_service.dto.LinkResponse;
+import com.dima.shortener_service.service.LinkCacheService;
 import com.dima.shortener_service.service.LinkService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,16 +18,14 @@ import java.net.URI;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 public class LinkController {
 
     private final LinkService linkService;
 
     private final AnalyticsClient analyticsClient;
 
-    public LinkController(LinkService linkService, AnalyticsClient analyticsClient) {
-        this.linkService = linkService;
-        this.analyticsClient = analyticsClient;
-    }
+    private final LinkCacheService linkCacheService;
 
     @PostMapping("/api/links")
     public ResponseEntity<LinkResponse> createLink(@Valid @RequestBody CreateLinkRequest request) {
@@ -39,7 +39,6 @@ public class LinkController {
             @PathVariable String shortCode,
             @RequestHeader(value = "User-Agent", defaultValue = "unknown") String userAgent) {
 
-        linkService.checkLinkExpiration(shortCode);
         String originalUrl = linkService.getOriginalUrl(shortCode);
 
         log.info("Redirecting shortcode: {} to: {}", shortCode, originalUrl);
@@ -64,7 +63,7 @@ public class LinkController {
 
     @DeleteMapping("/api/links/{shortCode}")
     public ResponseEntity<Void> deleteLink(@PathVariable String shortCode) {
-        linkService.deleteLink(shortCode);
+        linkCacheService.deleteLink(shortCode);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

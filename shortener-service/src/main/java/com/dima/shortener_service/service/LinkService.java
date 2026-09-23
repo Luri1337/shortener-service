@@ -11,8 +11,6 @@ import io.micrometer.core.instrument.MeterRegistry;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,13 +25,14 @@ public class LinkService {
     private final EventService eventService;
     private final Counter linksClickCounter;
     private final Counter linksCreateCounter;
+    private final LinkCacheService linkCacheService;
 
     @Value("${app.base-url}")
     private String baseUrl;
 
     public LinkService(LinkRepository linkRepository,
                        MeterRegistry meterRegistry,
-                       EventService eventService) {
+                       EventService eventService, LinkCacheService linkCacheService) {
         this.linkRepository = linkRepository;
         this.eventService = eventService;
 
@@ -44,6 +43,7 @@ public class LinkService {
         this.linksCreateCounter = Counter.builder("shortener.links.created")
                 .description("Total number of links created")
                 .register(meterRegistry);
+        this.linkCacheService = linkCacheService;
     }
 
     public LinkResponse createLink(CreateLinkRequest request) {
@@ -67,25 +67,17 @@ public class LinkService {
         return response;
     }
 
-    @Cacheable(value = "links", key = "#shortCode")
     public String getOriginalUrl(String shortCode) {
-        Link link = linkRepository
-                .findByShortCode(shortCode)
-                .orElseThrow(() -> new LinkNotFoundException("Link not found"));
+        CachedLink link = linkCacheService.get(shortCode);
 
-        return link.getOriginalUrl();
-    }
-
-    public void checkLinkExpiration(String shortCode) {
-        Link link = linkRepository
-                .findByShortCode(shortCode)
-                .orElseThrow(() -> new LinkNotFoundException("Link not found"));
-
-        if (link.isExpired()) {
+        if(link.isExpired()){
             log.warn("Link expired with shortcode: {}", shortCode);
             throw new LinkExpiredException("Link has expired");
         }
+
+        return link.originalUrl();
     }
+
 
     @Transactional
     public void publishLinkClickedEvent(String shortCode,
@@ -116,19 +108,6 @@ public class LinkService {
         response.setShortUrl(buildShortUrl(link.getShortCode()));
 
         return response;
-    }
-
-    @Transactional
-    @CacheEvict(value = "links", key = "#shortCode")
-    public void deleteLink(String shortCode) {
-        Link link = linkRepository
-                .findByShortCode(shortCode)
-                .orElseThrow(
-                        () -> new LinkNotFoundException("Link not found")
-                );
-
-        log.info("Deleting link with short code: {}", shortCode);
-        linkRepository.delete(link);
     }
 
     private String generateShortCode() {

@@ -39,8 +39,4 @@ public class Link {
 
     @Column(name = "expires_at")
     private Instant expiresAt;
-
-    public boolean isExpired() {
-        return expiresAt != null && Instant.now().isAfter(expiresAt);
-    }
 }
